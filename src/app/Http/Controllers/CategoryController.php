@@ -33,4 +33,25 @@ class CategoryController extends Controller
         $category->load('items');
         return view('categories.show', compact('category'));
     }
+
+    public function edit(Category $category)
+    {
+        return view('categories.edit', compact('category'));
+    }
+
+    public function update(Request $request, Category $category)
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+        $category->update($data);
+        return redirect()->route('categories.show', $category);
+    }
+
+    public function destroy(Category $category)
+    {
+        $category->delete();
+        return redirect()->route('categories.index');
+    }
 }
