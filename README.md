@@ -83,16 +83,3 @@ Siga os passos abaixo para configurar e iniciar a aplicação:
 
 6.  **Acesse a aplicação no navegador:**
     Abra seu navegador e vá para `http://localhost:8000`.
-
-## 🤝 Contribuição
-
-Contribuições são bem-vindas! Sinta-se à vontade para abrir issues para bugs ou sugestões, e enviar pull requests com melhorias.
-
-## 📄 Licença
-
-Este projeto está licenciado sob a [MIT License](LICENSE.md).
-
----
-
-Desenvolvido com 💙 por Manus AI.
-
