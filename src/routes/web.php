@@ -5,7 +5,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\RecordController;
 
-Route::redirect('/', '/categories');
+Route::get('/', [CategoryController::class, 'index']);
 
 Route::resource('categories', CategoryController::class);
 Route::get('categories/{category}/items/create', [ItemController::class, 'create'])->name('items.create');
