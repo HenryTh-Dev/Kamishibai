@@ -1,6 +1,15 @@
 # Kamishibai
 
+
 Aplicação Laravel para registro e análise de adesão a pacotes de cuidados (Kamishibai). Gestores podem cadastrar categorias (por exemplo, *"ADESÃO MENSAL AO PACOTE DE CUIDADOS DE CATETER VESICAL DE DEMORA (CVD)"*) e os itens de verificação que compõem cada categoria. Usuários marcam diariamente se cada item foi cumprido (**C**) ou não (**NC**), possibilitando geração de relatórios mensais e anuais.
+=======
+Aplicação Laravel para registro e análise de adesão a pacotes de cuidados
+(Kamishibai). Gestores podem cadastrar categorias (por exemplo, *"ADESÃO
+MENSAL AO PACOTE DE CUIDADOS DE CATETER VESICAL DE DEMORA (CVD)"*) e os
+itens de verificação que compõem cada categoria. Usuários marcam diariamente
+se cada item foi cumprido (**C**) ou não (**NC**), possibilitando geração de
+relatórios mensais e anuais.
+
 
 O projeto foi inicializado com Laravel 12 e contém migrations e models para:
 
@@ -30,3 +39,5 @@ O projeto foi inicializado com Laravel 12 e contém migrations e models para:
    php artisan test --testsuite=Feature
    php artisan test --testsuite=Unit
    ```
+=======
+

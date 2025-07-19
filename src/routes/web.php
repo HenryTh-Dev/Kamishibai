@@ -12,3 +12,9 @@ Route::get('categories/{category}/items/create', [ItemController::class, 'create
 Route::post('categories/{category}/items', [ItemController::class, 'store'])->name('items.store');
 Route::get('categories/{category}/records/create', [RecordController::class, 'create'])->name('records.create');
 Route::post('categories/{category}/records', [RecordController::class, 'store'])->name('records.store');
+=======
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
