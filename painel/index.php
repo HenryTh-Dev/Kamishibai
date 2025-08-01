@@ -189,8 +189,12 @@
                 </div>
                 <div class="col-md-4 text-end">
                     <div class="d-flex align-items-center justify-content-end">
-                        <i class="bi bi-calendar3 me-2"></i>
-                        <span id="current-month-display">Carregando...</span>
+                        <span id="current-month-display" style="visibility: hidden;  ">Carregando...</span>
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-end align-items-center">
+                                <input type="month" id="month-selector" class="form-control mx-2" style="max-width: 200px;" onchange="loadDashboard()">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -199,27 +203,6 @@
 
     <div class="container mt-4">
         <!-- Seletor de Mês -->
-        <div class="month-selector">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <h5 class="mb-0">
-                        <i class="bi bi-calendar-range me-2"></i>
-                        Selecionar Período
-                    </h5>
-                </div>
-                <div class="col-md-6">
-                    <div class="d-flex justify-content-end align-items-center">
-                        <button class="btn-month" onclick="changeMonth(-1)">
-                            <i class="bi bi-chevron-left"></i>
-                        </button>
-                        <input type="month" id="month-selector" class="form-control mx-2" style="max-width: 200px;" onchange="loadDashboard()">
-                        <button class="btn-month" onclick="changeMonth(1)">
-                            <i class="bi bi-chevron-right"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- Loading -->
         <div id="loading" class="loading">
@@ -233,9 +216,9 @@
             <div class="row mb-4">
                 <div class="col-md-3 mb-3">
                     <div class="stats-card text-center">
-                        <div class="stat-number text-primary" id="total-categories">0</div>
-                        <div class="stat-label">Categorias</div>
-                        <i class="bi bi-folder2-open" style="font-size: 2rem; color: #667eea;"></i>
+                        <div  class="stat-number" id="total-na" style="color: #ffd34f;" >0</div>
+                        <div class="stat-label" >Não Aplica</div>
+                        <i class="bi bi-dash-circle-fill" style="font-size: 2rem; color: #ffd34f;"></i>
                     </div>
                 </div>
                 <div class="col-md-3 mb-3">
@@ -286,22 +269,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Detalhes por Categoria -->
-            <div class="row">
-                <div class="col-12">
-                    <div class="stats-card">
-                        <h5 class="mb-4">
-                            <i class="bi bi-list-ul me-2"></i>
-                            Detalhes por Categoria
-                        </h5>
-                        <div id="categories-details">
-                            <!-- Será preenchido via JavaScript -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- Última Atualização -->
         <div class="last-update" id="last-update">
@@ -386,7 +353,7 @@
         
         function updateDashboard(data) {
             // Atualizar estatísticas gerais
-            document.getElementById('total-categories').textContent = data.totals.total_categories;
+            document.getElementById('total-na').textContent = data.totals.total_na;
             document.getElementById('total-completed').textContent = data.totals.total_completed;
             document.getElementById('total-not-completed').textContent = data.totals.total_not_completed;
             document.getElementById('completion-percentage').textContent = data.totals.completion_percentage + '%';
@@ -411,12 +378,13 @@
             generalChart = new Chart(ctx, {
                 type: 'pie',
                 data: {
-                    labels: ['Concluídas', 'Não Concluídas'],
+                    labels: ['Concluídas', 'Não Concluídas', 'Não Aplica'],
                     datasets: [{
-                        data: [totals.total_completed, totals.total_not_completed],
+                        data: [totals.total_completed, totals.total_not_completed, totals.total_na],
                         backgroundColor: [
                             '#28a745',
-                            '#dc3545'
+                            '#dc3545',
+                            '#ffd34f'
                         ],
                         borderWidth: 3,
                         borderColor: '#fff'
@@ -446,10 +414,11 @@
             if (categoryChart) {
                 categoryChart.destroy();
             }
-            
-            const labels = categories.map(cat => cat.category_name);
+
+            const labels = categories.map(c => c.description);
             const completedData = categories.map(cat => cat.completed_records);
             const notCompletedData = categories.map(cat => cat.not_completed_records);
+            const naData           = categories.map(c => c.na_records);
             
             categoryChart = new Chart(ctx, {
                 type: 'bar',
@@ -467,7 +436,14 @@
                             data: notCompletedData,
                             backgroundColor: '#dc3545',
                             borderRadius: 5
+                        },
+                        {
+                            label: 'Não Aplica',
+                            data: naData,
+                            backgroundColor: '#ffd34f',
+                            borderRadius: 5
                         }
+
                     ]
                 },
                 options: {
@@ -504,13 +480,13 @@
             categories.forEach(category => {
                 const categoryCard = document.createElement('div');
                 categoryCard.className = 'category-card';
-                
+
                 categoryCard.innerHTML = `
-                    <div class="row align-items-center">
-                        <div class="col-md-6">
-                            <h6 class="mb-1">${category.category_name}</h6>
-                            <p class="text-muted mb-0 small">${category.description || 'Sem descrição'}</p>
-                        </div>
+           <div class="row align-items-center">
+               <div class="col-md-6">
+                  <!-- usa description como título -->
+                   <h6 class="mb-1">${category.description || 'Sem descrição'}</h6>
+               </div>
                         <div class="col-md-2 text-center">
                             <div class="stat-number" style="font-size: 1.5rem; color: #28a745;">${category.completed_records}</div>
                             <small class="text-muted">Concluídas</small>

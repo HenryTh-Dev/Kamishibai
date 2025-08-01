@@ -495,6 +495,7 @@
                     totalActivities++;
                     switch (item.status) {
                         case 'C':
+                        case 'NA':
                             completedActivities++;
                             if (item.recorded_at) {
                                 recentActivities.push({

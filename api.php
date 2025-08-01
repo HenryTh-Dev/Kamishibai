@@ -4,6 +4,14 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
+
+
+ini_set('display_errors', 0);
+ini_set('log_errors',     1);
+error_reporting(E_ALL);
+ini_set('error_log',      __DIR__ . '/php-error.log');
+
+
 // Configuração do banco de dados
 $pdo = new PDO('sqlite:database.sqlite');
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -41,9 +49,10 @@ function getDashboardData($pdo, $month) {
                 c.name as category_name,
                 c.description,
                 COUNT(DISTINCT i.id) as total_items,
-                COUNT(CASE WHEN ar.status = 'C' THEN 1 END) as completed_records,
-                COUNT(CASE WHEN ar.status = 'NC' THEN 1 END) as not_completed_records,
-                COUNT(ar.id) as total_records
+           COUNT(CASE WHEN ar.status = 'C'  THEN 1 END) as completed_records,
+          COUNT(CASE WHEN ar.status = 'NC' THEN 1 END) as not_completed_records,
+         COUNT(CASE WHEN ar.status = 'NA' THEN 1 END) as na_records,
+                COUNT(ar.item_id) as total_records
             FROM categories c
             LEFT JOIN items i ON c.id = i.category_id
             LEFT JOIN activity_records ar ON i.id = ar.item_id 
@@ -62,18 +71,24 @@ function getDashboardData($pdo, $month) {
             'total_items' => 0,
             'total_completed' => 0,
             'total_not_completed' => 0,
+            'total_na'           => 0,
             'total_records' => 0
         ];
         
         foreach ($categories as &$category) {
             $totals['total_items'] += $category['total_items'];
             $totals['total_completed'] += $category['completed_records'];
+            $totals['total_na'] = ($totals['total_na'] ?? 0) + $category['na_records'];
             $totals['total_not_completed'] += $category['not_completed_records'];
             $totals['total_records'] += $category['total_records'];
             
             // Calcular percentual de conclusão
             if ($category['total_records'] > 0) {
-                $category['completion_percentage'] = round(($category['completed_records'] / $category['total_records']) * 100, 1);
+                $done = $category['completed_records'] + $category['na_records'];
+                $category['completion_percentage'] = round(
+                    ($done / $category['total_records']) * 100,
+                    1
+                );
             } else {
                 $category['completion_percentage'] = 0;
             }
@@ -81,7 +96,11 @@ function getDashboardData($pdo, $month) {
         
         // Calcular percentual geral
         if ($totals['total_records'] > 0) {
-            $totals['completion_percentage'] = round(($totals['total_completed'] / $totals['total_records']) * 100, 1);
+            $doneAll = $totals['total_completed'] + $totals['total_na'];
+            $totals['completion_percentage'] = round(
+                ($doneAll / $totals['total_records']) * 100,
+                1
+            );
         } else {
             $totals['completion_percentage'] = 0;
         }
@@ -126,7 +145,7 @@ function getCategoryProgress($pdo, $month) {
                 i.id,
                 i.description,
                 i.order_num,
-                COUNT(CASE WHEN ar.status = 'C' THEN 1 END) as completed_count,
+                COUNT(CASE WHEN ar.status IN ('C','NA') THEN 1 END) as completed_count,
                 COUNT(CASE WHEN ar.status = 'NC' THEN 1 END) as not_completed_count,
                 COUNT(ar.id) as total_records
             FROM items i
@@ -306,10 +325,10 @@ function recordActivity($pdo) {
             echo json_encode(['error' => 'Item ID e status são obrigatórios']);
             return;
         }
-        
-        if (!in_array($status, ['C', 'NC'])) {
+
+        if (!in_array($status, ['C', 'NC', 'NA'])) {
             http_response_code(400);
-            echo json_encode(['error' => 'Status deve ser C ou NC']);
+            echo json_encode(['error' => 'Status deve ser C, NC ou NA']);
             return;
         }
         
@@ -330,25 +349,22 @@ function recordActivity($pdo) {
         
         // Inserir ou atualizar registro
         $sql = "
-            INSERT INTO activity_records (item_id, record_date, status, created_at)
-            VALUES (?, ?, ?, datetime('now'))
-            ON CONFLICT(item_id, record_date) 
-            DO UPDATE SET 
-                status = excluded.status,
-                created_at = datetime('now')
-        ";
+        INSERT INTO activity_records (item_id, record_date, status, notes, created_at)
+        VALUES (?, ?, ?, ?, datetime('now'))
+        ON CONFLICT(item_id, record_date)
+        DO UPDATE SET
+            status     = excluded.status,
+            notes      = excluded.notes,
+            created_at = datetime('now')
+    ";
         
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$item_id, $record_date, $status]);
-        
+        $stmt->execute([$item_id, $record_date, $status, $notes]);
+
         echo json_encode([
             'success' => true,
             'message' => 'Atividade registrada com sucesso',
-            'data' => [
-                'item_id' => $item_id,
-                'status' => $status,
-                'record_date' => $record_date
-            ]
+            'data'    => ['item_id'=>$item_id,'status'=>$status,'record_date'=>$record_date,'notes'=>$notes]
         ]);
         
     } catch (Exception $e) {

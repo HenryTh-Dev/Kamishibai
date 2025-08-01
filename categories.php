@@ -266,6 +266,24 @@ if ($action === 'list') {
                     Usuários
                 </a>
             </div>
+            <div class="nav-item">
+                <a href="/painel/index.php" class="nav-link">
+                    <i class="bi bi-bar-chart-line"></i>
+                    Painel
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link">
+                    <i class="bi bi-calendar"></i>
+                    Relatório Mensal
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link">
+                    <i class="bi bi-archive"></i>
+                    Auditoria de Dados
+                </a>
+            </div>
             <hr class="my-3" style="border-color: rgba(255, 255, 255, 0.1);">
             <div class="nav-item">
                 <a href="logout.php" class="nav-link">
@@ -432,13 +450,13 @@ if ($action === 'list') {
                                 <div class="mb-4">
                                     <label for="description" class="form-label">
                                         <i class="bi bi-text-paragraph me-2"></i>
-                                        Descrição
+                                        Abreviação
                                     </label>
                                     <textarea class="form-control" 
                                               id="description" 
                                               name="description" 
-                                              rows="4"
-                                              placeholder="Descreva o objetivo e importância desta categoria de cuidados..."><?= htmlspecialchars($category['description'] ?? $_POST['description'] ?? '') ?></textarea>
+                                              rows="1"
+                                              placeholder="Abrevie a Categoria para o Painel"><?= htmlspecialchars($category['description'] ?? $_POST['description'] ?? '') ?></textarea>
                                     <div class="form-text">
                                         <i class="bi bi-info-circle me-1"></i>
                                         A descrição ajuda a contextualizar a categoria para os usuários.

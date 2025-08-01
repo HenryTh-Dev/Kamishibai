@@ -1,6 +1,8 @@
 <?php
-session_start();
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 // Configuração do banco de dados
 $db_file = __DIR__ . '/database.sqlite';
 
@@ -24,6 +26,15 @@ try {
             name VARCHAR(255) NOT NULL,
             description TEXT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE TABLE IF NOT EXISTS activity_records (
+            item_id      INTEGER    NOT NULL,
+            record_date  DATE       NOT NULL,
+            status       VARCHAR(10) NOT NULL,
+            notes        TEXT       NULL,
+            created_at   TIMESTAMP  DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (item_id, record_date),
+            FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE
         );
         
         CREATE TABLE IF NOT EXISTS items (

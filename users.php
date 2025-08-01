@@ -279,6 +279,24 @@ if ($action === 'list') {
                     Usuários
                 </a>
             </div>
+            <div class="nav-item">
+                <a href="/painel/index.php" class="nav-link">
+                    <i class="bi bi-bar-chart-line"></i>
+                    Painel
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link">
+                    <i class="bi bi-calendar"></i>
+                    Relatório Mensal
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link">
+                    <i class="bi bi-archive"></i>
+                    Auditoria de Dados
+                </a>
+            </div>
             <hr class="my-3" style="border-color: rgba(255, 255, 255, 0.1);">
             <div class="nav-item">
                 <a href="logout.php" class="nav-link">
@@ -349,7 +367,7 @@ if ($action === 'list') {
                                         <th width="60">#</th>
                                         <th>Nome</th>
                                         <th>E-mail</th>
-                                        <th width="100">Perfil</th>
+                                        <th width="150">Perfil</th>
                                         <th width="120">Criado em</th>
                                         <th width="120">Ações</th>
                                     </tr>

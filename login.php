@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($email) || empty($password)) {
         $error = 'Por favor, preencha todos os campos.';
     } else {
-        $stmt = $pdo->prepare("SELECT id, name, password, role FROM users WHERE email = ?");
+        $stmt = $pdo->prepare("SELECT id, name, email, password, role FROM users WHERE email = ?");
         $stmt->execute([$email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         
@@ -220,12 +220,6 @@ if (isset($_GET['logout'])) {
                             </div>
                         </form>
                         
-                        <div class="text-center mt-4">
-                            <p class="text-muted small">
-                                <i class="bi bi-info-circle me-1"></i>
-                                Credenciais: admin@kamishibai.com / admin123
-                            </p>
-                        </div>
                     </div>
                 </div>
             </div>

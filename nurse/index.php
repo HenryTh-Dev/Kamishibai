@@ -107,6 +107,11 @@ $user_name = $_SESSION['user_name'] ?? 'Enfermeira';
             border-color: var(--danger-color);
             background: #f8d7da;
         }
+
+        .item-card.na {
+            border-color: var(--warning-color);
+            background: #fff7d8;
+        }
         
         .item-description {
             font-size: 1.1rem;
@@ -161,7 +166,15 @@ $user_name = $_SESSION['user_name'] ?? 'Enfermeira';
             background: #c82333;
             color: white;
         }
-        
+        .btn-na {
+            background: #ffc107;
+            color: white;
+        }
+
+        .btn-na:hover {
+            background: #5a6268;
+            color: white;
+        }
         .btn-pending {
             background: #e9ecef;
             color: #6c757d;
@@ -200,6 +213,11 @@ $user_name = $_SESSION['user_name'] ?? 'Enfermeira';
         .loading {
             text-align: center;
             padding: 3rem;
+        }
+
+        .status-na {
+            background: #fac20a;
+            color: white;
         }
         
         .loading-spinner {
@@ -394,8 +412,9 @@ $user_name = $_SESSION['user_name'] ?? 'Enfermeira';
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        const currentUserEmail = '<?= addslashes($_SESSION['user_email']) ?>';
         let currentActivities = [];
-        
+
         // Inicializar página
         document.addEventListener('DOMContentLoaded', function() {
             // Definir data atual
@@ -424,7 +443,7 @@ $user_name = $_SESSION['user_name'] ?? 'Enfermeira';
         
         function loadActivities() {
             const date = document.getElementById('record-date').value;
-            
+            const scrollPos = window.scrollY;
             // Mostrar loading
             document.getElementById('loading').style.display = 'block';
             document.getElementById('activities-container').innerHTML = '';
@@ -451,6 +470,7 @@ $user_name = $_SESSION['user_name'] ?? 'Enfermeira';
                     // Esconder loading
                     document.getElementById('loading').style.display = 'none';
                     document.getElementById('summary-card').style.display = 'block';
+                    window.scrollTo(0, scrollPos);
                 });
         }
         
@@ -470,20 +490,25 @@ $user_name = $_SESSION['user_name'] ?? 'Enfermeira';
                     <div class="items-container">
                         ${category.items.map(item => `
                             <div class="item-card ${getItemStatusClass(item.status)}" style="position: relative;">
-                                ${item.status ? `<div class="status-indicator status-${item.status === 'C' ? 'completed' : 'not-completed'}">
-                                    <i class="bi bi-${item.status === 'C' ? 'check' : 'x'}"></i>
+                                ${item.status ? `<div class="status-indicator status-${item.status === 'C' ? 'completed' : item.status === 'NC' ? 'not-completed' : 'na'}">
+                                    <i class="bi bi-${item.status === 'C' ? 'check' : item.status === 'NC' ? 'x' : 'dash'}"></i>
                                 </div>` : ''}
                                 <div class="item-description">${item.description}</div>
                                 <div class="status-buttons">
-                                    <button class="status-btn btn-completed ${item.status === 'C' ? 'active' : ''}" 
+                                      <button class="status-btn btn-completed ${item.status === 'C' ? 'active' : ''}"
                                             onclick="recordActivity(${item.id}, 'C')">
                                         <i class="bi bi-check-circle-fill"></i>
                                         Concluído
                                     </button>
-                                    <button class="status-btn btn-not-completed ${item.status === 'NC' ? 'active' : ''}" 
+                                    <button class="status-btn btn-not-completed ${item.status === 'NC' ? 'active' : ''}"
                                             onclick="recordActivity(${item.id}, 'NC')">
                                         <i class="bi bi-x-circle-fill"></i>
                                         Não Concluído
+                                    </button>
+                                    <button class="status-btn btn-na ${item.status === 'NA' ? 'active' : ''}"
+                                            onclick="recordActivity(${item.id}, 'NA')">
+                                        <i class="bi bi-dash-circle-fill"></i>
+                                        N/A
                                     </button>
                                 </div>
                                 ${item.recorded_at ? `<small class="text-muted mt-2 d-block text-center">
@@ -512,19 +537,20 @@ $user_name = $_SESSION['user_name'] ?? 'Enfermeira';
             switch (status) {
                 case 'C': return 'completed';
                 case 'NC': return 'not-completed';
+                case 'NA': return 'na';
                 default: return '';
             }
         }
         
         function recordActivity(itemId, status) {
             const date = document.getElementById('record-date').value;
-            
-            // Dados para envio
-            const data = {
-                item_id: itemId,
-                status: status,
-                record_date: date,
-                user_id: 1 // Por enquanto, ID fixo
+
+                // Dados para envio (sem user_id e com vírgula antes de notes)
+                const data = {
+                    item_id:     itemId,
+                    status:      status,
+                    record_date: date,
+                    notes:       currentUserEmail
             };
             
             // Enviar para API
@@ -562,6 +588,7 @@ $user_name = $_SESSION['user_name'] ?? 'Enfermeira';
                     total++;
                     switch (item.status) {
                         case 'C':
+                        case 'NA':
                             completed++;
                             break;
                         case 'NC':
