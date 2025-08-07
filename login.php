@@ -83,7 +83,7 @@ if (isset($_GET['logout'])) {
 
             <img src="logo-completa.png" width="150vmin" style="opacity: 0.9;">
 
-                        <h3 class="mb-0">Kamishibai Admin</h3>
+                        <h3 class="mb-0">Kamishibai Logon</h3>
                         <p class="mb-0 opacity-75">Área Administrativa</p>
                     </div>
                     

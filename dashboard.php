@@ -61,7 +61,7 @@ $total_users = $stmt->fetchColumn();
                 </a>
             </div>
             <div class="nav-item">
-                <a class="nav-link">
+                <a href="export.php" class="nav-link">
                     <i class="bi bi-calendar"></i>
                     Relatório Mensal
                 </a>
