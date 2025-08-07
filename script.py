@@ -3,43 +3,19 @@
 import sys
 import random
 import sqlite3
+import cellmap
 from pathlib import Path
 from datetime import datetime
 from openpyxl import load_workbook
+from cellmap import CELL_MAP
 
 # Configurações fixas
 DB_PATH        = Path(__file__).parent / "database.sqlite"
-TEMPLATE_PATH  = Path(__file__).parent / "Planilha de Adesão e Análise Kamishibai_Adulto V2.xlsx"
+TEMPLATE_PATH  = Path(__file__).parent / "EXPORT.xlsx"
 OUTPUT_PATTERN = "Resumo_Kamishibai_{period}_{rand}.xlsx"
 
 # 1) Defina aqui, para cada combinação item_id + dia, a célula exata:
 #    a chave deve ter o formato '{item_id}X{DD:02d}', ex: '1X01' para item_id=1 e dia=01.
-CELL_MAP = {
-    '5X01': 'B4',
-    '5X02': 'C4',
-    '5X03': 'D4',
-    '5X04': 'E4',
-    '5X05': 'F4',
-    '5X06': 'G4',
-    '6X01': 'B5',
-    '6X02': 'C5',
-    '6X03': 'D5',
-    '6X04': 'E5',
-    '6X05': 'F5',
-    '6X06': 'G5',
-    '7X01': 'B6',
-    '7X02': 'C6',
-    '7X03': 'D6',
-    '7X04': 'E6',
-    '7X05': 'F6',
-    '7X06': 'G6',
-    '8X01': 'B7',
-    '8X02': 'C7',
-    '8X03': 'D7',
-    '8X04': 'E7',
-    '8X05': 'F7',
-    '8X06': 'G7',
-}
 
 # Query para buscar o status exato ('C', 'NC' ou 'NA')
 STATUS_QUERY = """
