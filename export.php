@@ -1,4 +1,12 @@
 <?php
+// export.php
+
+// Desativa compressão que pode adulterar binários
+if (function_exists('apache_setenv')) {
+    apache_setenv('no-gzip', '1');
+}
+ini_set('zlib.output_compression', 'Off');
+
 require_once 'config.php';
 requireAuth();
 
@@ -10,10 +18,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!preg_match('/^\d{4}-\d{2}$/', $period)) {
         $error = 'Formato inválido. Use AAAA-MM, ex: 2025-08';
     } else {
-        // Chama o script Python /var/www/html/script.py
-        $python   = '/usr/bin/python3';
-        $script   = '/var/www/html/script.py';
-        $cmd      = escapeshellcmd("$python $script " . escapeshellarg($period));
+        // Chama o script Python
+        $python = '/usr/bin/python3';
+        $script = '/var/www/html/script.py';
+        $cmd    = escapeshellcmd("$python $script " . escapeshellarg($period));
         exec($cmd, $output, $returnVar);
 
         if ($returnVar !== 0) {
@@ -30,18 +38,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!$filePath || !file_exists($filePath)) {
                 $error = 'Arquivo não encontrado: ' . htmlspecialchars($filePath);
             } else {
-                // Força download do arquivo .xlsx
+                // Limpa todos os buffers de saída
+                while (ob_get_level()) {
+                    ob_end_clean();
+                }
+
+                // Headers para download binário
+                header('Content-Description: File Transfer');
                 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
                 header('Content-Disposition: attachment; filename="' . basename($filePath) . '"');
+                header('Content-Transfer-Encoding: binary');
+                header('Expires: 0');
+                header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+                header('Pragma: public');
                 header('Content-Length: ' . filesize($filePath));
-                readfile($filePath);
+
+                // Envia o arquivo em blocos
+                $fp = fopen($filePath, 'rb');
+                if ($fp) {
+                    while (!feof($fp)) {
+                        echo fread($fp, 8192);
+                    }
+                    fclose($fp);
+                }
                 exit;
             }
         }
     }
 }
-?>
-<!DOCTYPE html>
+?><!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -60,33 +85,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p class="mb-0 opacity-75 small">Santa Casa de Araçatuba</p>
     </div>
     <div class="sidebar-nav">
-        <div class="nav-item">
-            <a href="dashboard.php" class="nav-link"><i class="bi bi-speedometer2"></i> Dashboard</a>
-        </div>
-        <div class="nav-item">
-            <a href="categories.php" class="nav-link"><i class="bi bi-folder"></i> Categorias</a>
-        </div>
-        <div class="nav-item">
-            <a href="users.php" class="nav-link"><i class="bi bi-people"></i> Usuários</a>
-        </div>
-        <div class="nav-item">
-            <a href="/painel/index.php" class="nav-link"><i class="bi bi-bar-chart-line"></i> Painel</a>
-        </div>
-        <div class="nav-item">
-            <a href="export.php" class="nav-link active"><i class="bi bi-calendar"></i> Relatório Mensal</a>
-        </div>
-        <div class="nav-item">
-            <a href="audit.php" class="nav-link"><i class="bi bi-archive"></i> Auditoria de Dados</a>
-        </div>
+        <div class="nav-item"><a href="dashboard.php" class="nav-link"><i class="bi bi-speedometer2"></i> Dashboard</a></div>
+        <div class="nav-item"><a href="categories.php" class="nav-link"><i class="bi bi-folder"></i> Categorias</a></div>
+        <div class="nav-item"><a href="users.php" class="nav-link"><i class="bi bi-people"></i> Usuários</a></div>
+        <div class="nav-item"><a href="/painel/index.php" class="nav-link"><i class="bi bi-bar-chart-line"></i> Painel</a></div>
+        <div class="nav-item"><a href="export.php" class="nav-link active"><i class="bi bi-calendar"></i> Relatório Mensal</a></div>
+        <div class="nav-item"><a href="audit.php" class="nav-link"><i class="bi bi-archive"></i> Auditoria de Dados</a></div>
         <hr class="my-3" style="border-color: rgba(255,255,255,.1)">
-        <div class="nav-item">
-            <a href="logout.php" class="nav-link"><i class="bi bi-box-arrow-right"></i> Sair</a>
-        </div>
+        <div class="nav-item"><a href="logout.php" class="nav-link"><i class="bi bi-box-arrow-right"></i> Sair</a></div>
         <footer class="app-footer mt-auto py-3">
             <div class="container text-center">
                 <small>
-                    Desenvolvido por
-                    <a href="https://github.com/HenryTh-Dev" target="_blank">Henry Thiago</a>
+                    Desenvolvido por <a href="https://github.com/HenryTh-Dev" target="_blank">Henry Thiago</a>
                     — <a href="https://www.santacasadearacatuba.com.br/" target="_blank">Santa Casa de Araçatuba</a>
                 </small>
             </div>
@@ -130,12 +140,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="mb-3">
                     <label for="period" class="form-label">Mês de referência</label>
                     <input
-                        type="month"
-                        class="form-control"
-                        id="period"
-                        name="period"
-                        required
-                        value="<?= htmlspecialchars($period); ?>"
+                            type="month"
+                            class="form-control"
+                            id="period"
+                            name="period"
+                            required
+                            value="<?= htmlspecialchars($period); ?>"
                     >
                     <div class="form-text">Formato: AAAA-MM (ex: 2025-08)</div>
                 </div>
