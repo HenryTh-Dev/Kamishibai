@@ -12,7 +12,7 @@ from cellmap import CELL_MAP
 # Configurações fixas
 DB_PATH        = Path(__file__).parent / "database.sqlite"
 TEMPLATE_PATH  = Path(__file__).parent / "EXPORT.xlsx"
-OUTPUT_PATTERN = "Resumo_Kamishibai_{period}_{rand}.xlsx"
+OUTPUT_PATTERN = "outputxl/Resumo_Kamishibai_{period}_{rand}.xlsx"
 
 # 1) Defina aqui, para cada combinação item_id + dia, a célula exata:
 #    a chave deve ter o formato '{item_id}X{DD:02d}', ex: '1X01' para item_id=1 e dia=01.
