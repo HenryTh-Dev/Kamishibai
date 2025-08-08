@@ -105,7 +105,7 @@ $user_name = $_SESSION['user_name'] ?? 'Enfermeira';
 </div>
 
 <!-- Mensagem de Sucesso -->
-<div id="success-message" class="success-message">
+<div id="success-message" class="success-message" " ;>
     <i class="bi bi-check-circle-fill me-2"></i>
     Atividade registrada com sucesso!
 </div>
