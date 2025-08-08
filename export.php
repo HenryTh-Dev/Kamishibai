@@ -1,7 +1,4 @@
 <?php
-// export.php
-
-// Desativa compressão que pode adulterar binários
 if (function_exists('apache_setenv')) {
     apache_setenv('no-gzip', '1');
 }
@@ -27,7 +24,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($returnVar !== 0) {
             $error = 'Erro ao gerar o relatório:<br>' . implode("<br>", $output);
         } else {
-            // Captura caminho do arquivo gerado na saída do Python
             $filePath = '';
             foreach ($output as $line) {
                 if (strpos($line, 'Resumo gerado:') !== false) {
