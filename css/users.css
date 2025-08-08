@@ -120,3 +120,17 @@
             background: #e9ecef;
             color: #495057;
         }
+
+    .app-footer small {
+        color:  rgba(255, 255, 255, 0.8);
+        font-size: 0.875rem;
+    }
+    .app-footer a
+    {
+        text-decoration: none;
+        color: rgba(255, 255, 255, 0.8);
+    }
+    .app-footer a:hover
+    {
+        text-decoration: underline;
+    }

@@ -96,3 +96,17 @@
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
             color: white;
         }
+
+        .app-footer small {
+            color:  rgba(255, 255, 255, 0.8);
+            font-size: 0.875rem;
+        }
+        .app-footer a
+        {
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        .app-footer a:hover
+        {
+            text-decoration: underline;
+        }

@@ -130,61 +130,11 @@ if ($action === 'list') {
 </head>
 <body>
     <!-- Sidebar -->
-    <nav class="sidebar">
-        <div class="sidebar-header">
-            <h4 class="mb-0">
-                <i class="bi bi-kanban me-2"></i>
-                Kamishibai Admin
-            </h4>
-            <p class="mb-0 opacity-75 small">Sistema de Gestão</p>
-        </div>
-        
-        <div class="sidebar-nav">
-            <div class="nav-item">
-                <a href="dashboard.php" class="nav-link">
-                    <i class="bi bi-speedometer2"></i>
-                    Dashboard
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="categories.php" class="nav-link">
-                    <i class="bi bi-folder"></i>
-                    Categorias
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="users.php" class="nav-link active">
-                    <i class="bi bi-people"></i>
-                    Usuários
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="/painel/index.php" class="nav-link">
-                    <i class="bi bi-bar-chart-line"></i>
-                    Painel
-                </a>
-            </div>
-            <div class="nav-item">
-                <a class="nav-link">
-                    <i class="bi bi-calendar"></i>
-                    Relatório Mensal
-                </a>
-            </div>
-            <div class="nav-item">
-                <a class="nav-link">
-                    <i class="bi bi-archive"></i>
-                    Auditoria de Dados
-                </a>
-            </div>
-            <hr class="my-3" style="border-color: rgba(255, 255, 255, 0.1);">
-            <div class="nav-item">
-                <a href="logout.php" class="nav-link">
-                    <i class="bi bi-box-arrow-right"></i>
-                    Sair
-                </a>
-            </div>
-        </div>
-    </nav>
+    <!-- Sidebar -->
+
+    <?php
+    include "includes/sidebar.php";
+    ?>
 
     <!-- Main Content -->
     <div class="main-content">
