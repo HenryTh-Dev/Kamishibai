@@ -59,7 +59,6 @@ $total_users = $stmt->fetchColumn();
 
         <!-- Content Area -->
         <div class="content-area">
-            <!-- Welcome Card -->
             <div class="welcome-card">
                 <div class="row align-items-center">
                     <div class="col-md-8">

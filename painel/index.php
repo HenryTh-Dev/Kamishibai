@@ -18,7 +18,7 @@
             <div class="row align-items-center">
                 <div class="col-md-8">
                     <h1 class="mb-0">
-                        <i class="bi bi-bar-chart-fill me-3"></i>
+                        <img src="../logo.png" width="70px" style="opacity: 0.9;">
                         Painel de Atividades Kamishibai
                     </h1>
                     <p class="mb-0 mt-2 opacity-75">Acompanhe o progresso das atividades em tempo real</p>

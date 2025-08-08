@@ -145,7 +145,20 @@ if ($action === 'create' && $category_id) {
                 <h5 class="mb-0"><?= $action === 'create' ? 'Novo Item' : 'Editar Item' ?></h5>
             </div>
             <div class="d-flex align-items-center">
-                <span class="me-3">Bem-vindo, <?= htmlspecialchars($_SESSION['user_name']) ?>!</span>
+                <div class="dropdown">
+                    <span class="me-3">Bem-vindo, <?= htmlspecialchars($_SESSION['user_name']) ?>!</span>
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="logout.php">
+                                <i class="bi bi-box-arrow-right me-2"></i>
+                                Sair
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
 

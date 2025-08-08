@@ -39,6 +39,7 @@
                 Auditoria de Dados
             </a>
         </div>
+
         <div class="nav-item">
             <a href="/painel/index.php" class="nav-link">
                 <i class="bi bi-bar-chart-line"></i>
