@@ -74,31 +74,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
 <!-- Sidebar -->
-<nav class="sidebar">
-    <div class="sidebar-header">
-        <img src="logo.png" width="50" style="opacity:.9">
-        <h4 class="mb-0">Kamishibai Admin</h4>
-        <p class="mb-0 opacity-75 small">Santa Casa de Araçatuba</p>
-    </div>
-    <div class="sidebar-nav">
-        <div class="nav-item"><a href="dashboard.php" class="nav-link"><i class="bi bi-speedometer2"></i> Dashboard</a></div>
-        <div class="nav-item"><a href="categories.php" class="nav-link"><i class="bi bi-folder"></i> Categorias</a></div>
-        <div class="nav-item"><a href="users.php" class="nav-link"><i class="bi bi-people"></i> Usuários</a></div>
-        <div class="nav-item"><a href="/painel/index.php" class="nav-link"><i class="bi bi-bar-chart-line"></i> Painel</a></div>
-        <div class="nav-item"><a href="export.php" class="nav-link active"><i class="bi bi-calendar"></i> Relatório Mensal</a></div>
-        <div class="nav-item"><a href="audit.php" class="nav-link"><i class="bi bi-archive"></i> Auditoria de Dados</a></div>
-        <hr class="my-3" style="border-color: rgba(255,255,255,.1)">
-        <div class="nav-item"><a href="logout.php" class="nav-link"><i class="bi bi-box-arrow-right"></i> Sair</a></div>
-        <footer class="app-footer mt-auto py-3">
-            <div class="container text-center">
-                <small>
-                    Desenvolvido por <a href="https://github.com/HenryTh-Dev" target="_blank">Henry Thiago</a>
-                    — <a href="https://www.santacasadearacatuba.com.br/" target="_blank">Santa Casa de Araçatuba</a>
-                </small>
-            </div>
-        </footer>
-    </div>
-</nav>
+<?php
+include "includes/sidebar.php";
+?>
 
 <!-- Main Content -->
 <div class="main-content">
