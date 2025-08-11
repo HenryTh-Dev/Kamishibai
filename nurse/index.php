@@ -19,8 +19,6 @@ $user_name = $_SESSION['user_name'] ?? 'Enfermeira';
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="nurse.css" rel="stylesheet">
-    <style>
-    </style>
 </head>
 <body>
 <!-- Header -->
@@ -105,15 +103,19 @@ $user_name = $_SESSION['user_name'] ?? 'Enfermeira';
 </div>
 
 <!-- Mensagem de Sucesso -->
-<div id="success-message" class="success-message" " ;>
+<div id="success-message" class="success-message">
     <i class="bi bi-check-circle-fill me-2"></i>
     Atividade registrada com sucesso!
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    const currentUserEmail = '<?= addslashes($_SESSION['user_email']) ?>';
+    // Agora usamos o username para auditoria
+    const currentUsername = '<?= addslashes($_SESSION['user_username'] ?? '') ?>';
     let currentActivities = [];
+
+    // Debug opcional
+    console.debug('DEBUG currentUsername =', currentUsername);
 
     // Inicializar página
     document.addEventListener('DOMContentLoaded', function() {
@@ -175,61 +177,61 @@ $user_name = $_SESSION['user_name'] ?? 'Enfermeira';
             categoryCard.className = 'category-card';
 
             categoryCard.innerHTML = `
-                    <div class="category-header">
-                        <div class="category-title">${category.name}</div>
-                        <div class="category-description">${category.description || 'Sem descrição'}</div>
-                    </div>
-                    <div class="items-container">
-                        ${category.items.map(item => `
-                            <div class="item-card ${getItemStatusClass(item.status)}" style="position: relative;">
-                                ${item.status ? `<div class="status-indicator status-${item.status === 'C' ? 'completed' : item.status === 'NC' ? 'not-completed' : 'na'}">
-                                    <i class="bi bi-${item.status === 'C' ? 'check' : item.status === 'NC' ? 'x' : 'dash'}"></i>
-                                </div>` : ''}
+                <div class="category-header">
+                    <div class="category-title">${category.name}</div>
+                    <div class="category-description">${category.description || 'Sem descrição'}</div>
+                </div>
+                <div class="items-container">
+                    ${category.items.map(item => `
+                        <div class="item-card ${getItemStatusClass(item.status)}" style="position: relative;">
+                            ${item.status ? `<div class="status-indicator status-${item.status === 'C' ? 'completed' : item.status === 'NC' ? 'not-completed' : 'na'}">
+                                <i class="bi bi-${item.status === 'C' ? 'check' : item.status === 'NC' ? 'x' : 'dash'}"></i>
+                            </div>` : ''}
 
-                                <div class="item-description">${item.description}</div>
+                            <div class="item-description">${item.description}</div>
 
-                                <div class="status-buttons">
-                                    <button type="button"
-                                            class="status-btn btn-completed ${item.status === 'C' ? 'active' : ''}"
-                                            onclick="recordActivity(${item.id}, 'C')">
-                                        <i class="bi bi-check-circle-fill"></i>
-                                        Concluído
-                                    </button>
+                            <div class="status-buttons">
+                                <button type="button"
+                                        class="status-btn btn-completed ${item.status === 'C' ? 'active' : ''}"
+                                        onclick="recordActivity(${item.id}, 'C')">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                    Concluído
+                                </button>
 
-                                    <button type="button"
-                                            class="status-btn btn-not-completed ${item.status === 'NC' ? 'active' : ''}"
-                                            onclick="recordActivity(${item.id}, 'NC')">
-                                        <i class="bi bi-x-circle-fill"></i>
-                                        Não Concluído
-                                    </button>
+                                <button type="button"
+                                        class="status-btn btn-not-completed ${item.status === 'NC' ? 'active' : ''}"
+                                        onclick="recordActivity(${item.id}, 'NC')">
+                                    <i class="bi bi-x-circle-fill"></i>
+                                    Não Concluído
+                                </button>
 
-                                    <button type="button"
-                                            class="status-btn btn-na ${item.status === 'NA' ? 'active' : ''}"
-                                            onclick="recordActivity(${item.id}, 'NA')">
-                                        <i class="bi bi-dash-circle-fill"></i>
-                                        N/A
-                                    </button>
-                                </div>
-
-                                ${item.recorded_at ? `<small class="text-muted mt-2 d-block text-center">
-                                    Registrado em: ${new Date(item.recorded_at).toLocaleString('pt-BR')}
-                                </small>` : ''}
+                                <button type="button"
+                                        class="status-btn btn-na ${item.status === 'NA' ? 'active' : ''}"
+                                        onclick="recordActivity(${item.id}, 'NA')">
+                                    <i class="bi bi-dash-circle-fill"></i>
+                                    N/A
+                                </button>
                             </div>
-                        `).join('')}
-                    </div>
-                `;
+
+                            ${item.recorded_at ? `<small class="text-muted mt-2 d-block text-center">
+                                Registrado em: ${new Date(item.recorded_at).toLocaleString('pt-BR')}
+                            </small>` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
 
             container.appendChild(categoryCard);
         });
 
         if (categories.length === 0) {
             container.innerHTML = `
-                    <div class="text-center py-5">
-                        <i class="bi bi-inbox" style="font-size: 4rem; color: #dee2e6;"></i>
-                        <h5 class="mt-3 text-muted">Nenhuma atividade encontrada</h5>
-                        <p class="text-muted">Não há atividades cadastradas para registro.</p>
-                    </div>
-                `;
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox" style="font-size: 4rem; color: #dee2e6;"></i>
+                    <h5 class="mt-3 text-muted">Nenhuma atividade encontrada</h5>
+                    <p class="text-muted">Não há atividades cadastradas para registro.</p>
+                </div>
+            `;
         }
     }
 
@@ -249,7 +251,7 @@ $user_name = $_SESSION['user_name'] ?? 'Enfermeira';
             item_id:     itemId,
             status:      status,
             record_date: date,
-            notes:       currentUserEmail
+            notes:       currentUsername   // << grava o username no campo notes
         };
 
         fetch('../api.php?action=record_activity', {
