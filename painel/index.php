@@ -21,7 +21,7 @@
                         <img src="../logo.png" width="70px" style="opacity: 0.9;">
                         Painel de Atividades Kamishibai
                     </h1>
-                    <p class="mb-0 mt-2 opacity-75">Acompanhe o progresso das atividades em tempo real</p>
+
                 </div>
                 <div class="col-md-4 text-end">
                     <div class="d-flex align-items-center justify-content-end">
@@ -105,13 +105,6 @@
                     </div>
                 </div>
             </div>
-
-        <!-- Última Atualização -->
-        <div class="last-update" id="last-update">
-            Última atualização: <span id="update-time">--</span>
-        </div>
-    </div>
-
     <!-- Botão de Refresh -->
     <button class="refresh-btn" onclick="loadDashboard()" title="Atualizar dados">
         <i class="bi bi-arrow-clockwise"></i>
@@ -121,7 +114,7 @@
     <script>
         let generalChart = null;
         let categoryChart = null;
-        
+
         // Inicializar página
         document.addEventListener('DOMContentLoaded', function() {
             // Definir mês atual
@@ -131,6 +124,7 @@
             
             // Carregar dados
             loadDashboard();
+            checkFooterStatus();
             
             // Auto-refresh a cada 5 minutos
             setInterval(loadDashboard, 300000);
@@ -368,7 +362,33 @@
                 </div>
             `;
         }
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboard();
+            checkFooterStatus();
+            setInterval(loadDashboard, 300000);
+            setInterval(checkFooterStatus, 300000);
+        });
+
+        function checkFooterStatus() {
+            fetch(`../api.php?action=get_footer_status`)
+                .then(response => response.json())
+                .then(data => {
+                    const footer = document.getElementById('footer-section');
+                    if (data.success && data.footer_enabled === 1) {
+                        footer.style.display = 'flex';
+                    } else {
+                        footer.style.display = 'none';
+                    }
+                })
+                .catch(err => console.error("Erro ao buscar status do footer:", err));
+        }
+
     </script>
 </body>
+<footer id="footer-section" class="footer-logos" style="display: none;">
+    <img src="../assets/logos-1.png" alt="Logos 1">
+    <img src="../assets/logos-2.png" alt="Logos 2">
+    <img src="../assets/logos-3.png" alt="Logos 3">
+</footer>
 </html>
 

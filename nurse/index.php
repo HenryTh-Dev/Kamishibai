@@ -27,7 +27,7 @@ $user_name = $_SESSION['user_name'] ?? 'Enfermeira';
         <div class="row align-items-center">
             <div class="col-md-8">
                 <h1 class="mb-0">
-                    <i class="bi bi-heart-pulse-fill me-3"></i>
+                    <img src="../logo.png" width="50px" style="opacity: 0.9;">
                     Registro de Atividades UTI
                 </h1>
                 <p class="mb-0 mt-2 opacity-75">Bem-vinda, <?= htmlspecialchars($user_name) ?>!</p>
@@ -107,7 +107,6 @@ $user_name = $_SESSION['user_name'] ?? 'Enfermeira';
     <i class="bi bi-check-circle-fill me-2"></i>
     Atividade registrada com sucesso!
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     // Agora usamos o username para auditoria

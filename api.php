@@ -23,6 +23,9 @@ switch ($action) {
     case 'dashboard_data':
         getDashboardData($pdo, $month);
         break;
+    case 'get_footer_status':
+        getFooterStatus($pdo);
+        break;
     case 'category_progress':
         getCategoryProgress($pdo, $month);
         break;
@@ -233,6 +236,14 @@ function getNurseActivities($pdo) {
         echo json_encode(['error' => 'Erro ao buscar atividades: ' . $e->getMessage()]);
     }
 }
+function getFooterStatus($pdo) {
+    $stmt = $pdo->query("SELECT footer_enabled FROM status WHERE id = 1");
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    echo json_encode([
+        'success' => true,
+        'footer_enabled' => (int)$row['footer_enabled']
+    ]);
+}
 
 function getActivitiesByDate($pdo) {
     try {
@@ -372,5 +383,6 @@ function recordActivity($pdo) {
         echo json_encode(['error' => 'Erro ao registrar atividade: ' . $e->getMessage()]);
     }
 }
+
 ?>
 

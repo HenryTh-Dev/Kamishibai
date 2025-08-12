@@ -16,7 +16,7 @@
         .header {
             background: var(--primary-gradient);
             color: white;
-            padding: 2rem 0;
+            padding: 1rem 0;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
         
@@ -163,4 +163,30 @@
             color: #6c757d;
             text-align: center;
             margin-top: 1rem;
+        }
+        .footer-logos {
+            background: white;
+            padding: 0.5rem 1rem;
+            border-top: 1px solid #ddd;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            z-index: 900;
+        }
+
+        .footer-logos img {
+            max-height: 90px;
+            height: auto;
+            width: auto;
+            opacity: 0.95;
+            transition: opacity 0.3s ease;
+        }
+
+        .footer-logos img:hover {
+            opacity: 1;
         }

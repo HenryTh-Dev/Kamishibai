@@ -22,8 +22,7 @@ try {
         return false;
     };
 
-    // --------- Criação de tabelas (schema novo, com username) ----------
-    // Observação: a ordem permite FKs tranquilamente
+
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -32,6 +31,10 @@ try {
             password VARCHAR(255) NOT NULL,
             role VARCHAR(10) DEFAULT 'user',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE TABLE IF NOT EXISTS status (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            footer_enabled INTEGER DEFAULT 1 
         );
 
         CREATE TABLE IF NOT EXISTS categories (
@@ -77,12 +80,18 @@ try {
                 );
             ");
 
+            $count = $pdo->query("SELECT COUNT(*) FROM status")->fetchColumn();
+            if ($count == 0) {
+                    $pdo->exec("INSERT INTO status (footer_enabled) VALUES (1)");
+            }
+
             // Copia dados: usa o email antigo como username
             $pdo->exec("
                 INSERT INTO users_new (id, name, username, password, role, created_at)
                 SELECT id, name, email AS username, password, role, created_at
                 FROM users;
             ");
+
 
             // Troca as tabelas
             $pdo->exec("DROP TABLE users;");
