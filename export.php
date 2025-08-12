@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         // Chama o script Python
         $python = '/usr/bin/python3';
-        $script = '/var/www/html/script.py';
+        $script = '/var/www/html/kamishibai/script.py';
         $cmd    = escapeshellcmd("$python $script " . escapeshellarg($period));
         exec($cmd, $output, $returnVar);
 
