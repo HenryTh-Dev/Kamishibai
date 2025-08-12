@@ -126,10 +126,18 @@ $total_users = $stmt->fetchColumn();
                                 <i class="bi bi-plus-circle me-2"></i>
                                 Nova Categoria
                             </a>
-                            <a href="categories.php" class="btn btn-outline-primary">
-                                <i class="bi bi-folder me-2"></i>
-                                Gerenciar Categorias
-                            </a>
+
+                            <button onclick="setFooterStatus(1)" class="btn btn-gradient">
+                                <i class="bi bi-toggle-on me-2"></i>
+                                Ligar Footer
+                            </button>
+
+
+                            <button onclick="setFooterStatus(0)" class="btn btn-gradient">
+                                <i class="bi bi-toggle-off me-2"></i>
+                                Desligar Footer
+                            </button>
+
                         </div>
                     </div>
                 </div>
@@ -141,16 +149,16 @@ $total_users = $stmt->fetchColumn();
                         </h5>
                         <ul class="list-unstyled mb-0">
                             <li class="mb-2">
-                                <i class="bi bi-check-circle text-success me-2"></i>
-                                Sistema funcionando normalmente
-                            </li>
-                            <li class="mb-2">
                                 <i class="bi bi-shield-check text-primary me-2"></i>
                                 Autenticação ativa
                             </li>
-                            <li class="mb-0">
+                            <li class="mb-2">
                                 <i class="bi bi-database text-info me-2"></i>
                                 Banco de dados conectado
+                            </li>
+                            <li class="mb-0">
+                                <i class="bi bi-toggles2 text-primary me-2"></i>
+                                Status do Footer: <span id="statusFooter">a</span>
                             </li>
                         </ul>
                     </div>
@@ -161,10 +169,46 @@ $total_users = $stmt->fetchColumn();
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        window.onload = function() {
+            checkFooterStatus();
+        };
         // Sidebar toggle for mobile
         document.getElementById('sidebarToggle')?.addEventListener('click', function() {
             document.querySelector('.sidebar').classList.toggle('show');
         });
+        function setFooterStatus(value) {
+            fetch(`../api.php?action=set_footer_status&value=${value}`, {
+                method: 'POST'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        checkFooterStatus(); // atualiza o footer na hora
+                    } else {
+                        alert("Erro: " + data.error);
+                    }
+                })
+                .catch(err => console.error("Erro ao atualizar footer:", err));
+        }
+        function checkFooterStatus() {
+            fetch(`../api.php?action=get_footer_status`)
+                .then(response => response.json())
+                .then(data => {
+                    const footer = document.getElementById('footer-section');
+                    const statusText = document.getElementById('statusFooter');
+
+                    if (data.success && Number(data.footer_enabled) === 1) {
+
+                        statusText.textContent = "Ativo";
+                        statusText.className = "text-success fw-bold"; // verde
+                    } else {
+                        statusText.textContent = "Desativado";
+                        statusText.className = "text-danger fw-bold"; // vermelho
+                    }
+                })
+                .catch(err => console.error("Erro ao buscar status do footer:", err));
+        }
+
     </script>
 </body>
 </html>

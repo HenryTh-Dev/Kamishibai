@@ -38,6 +38,9 @@ switch ($action) {
     case 'get_activities_by_date':
         getActivitiesByDate($pdo);
         break;
+    case 'set_footer_status':
+        setFooterStatus($pdo);
+        break;
     default:
         http_response_code(400);
         echo json_encode(['error' => 'Ação não especificada']);
@@ -310,6 +313,16 @@ function getActivitiesByDate($pdo) {
     } catch (Exception $e) {
         http_response_code(500);
         echo json_encode(['error' => 'Erro ao buscar atividades por data: ' . $e->getMessage()]);
+    }
+}
+
+function setFooterStatus($pdo) {
+    $value = isset($_GET['value']) ? (int) $_GET['value'] : 0;
+    $stmt = $pdo->prepare("UPDATE status SET footer_enabled = ? WHERE id = 1");
+    if ($stmt->execute([$value])) {
+        echo json_encode(['success' => true]);
+    } else {
+        echo json_encode(['success' => false, 'error' => 'Não foi possível atualizar o status']);
     }
 }
 
