@@ -106,6 +106,50 @@ if ($action === 'list') {
         redirect('users.php');
     }
 }
+// Ativar/Desativar usuário
+if ($action === 'toggle_active' && $id) {
+    if ($id == $_SESSION['user_id']) {
+        $error = 'Você não pode desativar/reativar a própria conta enquanto estiver logado.';
+    } else {
+        // pega status atual
+        $stmt = $pdo->prepare("SELECT is_active FROM users WHERE id = ?");
+        $stmt->execute([$id]);
+        $current = $stmt->fetchColumn();
+
+        if ($current === false) {
+            $error = 'Usuário não encontrado.';
+        } else {
+            $nowBr = (new DateTime('now', new DateTimeZone('America/Sao_Paulo')))->format('Y-m-d H:i:s');
+            $actor = $_SESSION['user_email'] ?? $_SESSION['email'] ?? $_SESSION['user_name'] ?? 'desconhecido';
+
+            if ((int)$current === 1) {
+                // desativar
+                $stmt = $pdo->prepare("
+                    UPDATE users
+                    SET is_active = 0,
+                        deactivated_at = ?,
+                        deactivated_by = ?
+                    WHERE id = ?
+                ");
+                $ok = $stmt->execute([$nowBr, $actor, $id]);
+                $success = $ok ? 'Usuário desativado.' : 'Erro ao desativar usuário.';
+            } else {
+                // reativar
+                $stmt = $pdo->prepare("
+                    UPDATE users
+                    SET is_active = 1,
+                        deactivated_at = NULL,
+                        deactivated_by = NULL
+                    WHERE id = ?
+                ");
+                $ok = $stmt->execute([$id]);
+                $success = $ok ? 'Usuário reativado.' : 'Erro ao reativar usuário.';
+            }
+        }
+    }
+    header("Location: users.php");
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -125,6 +169,29 @@ if ($action === 'list') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="/css/users.css" rel="stylesheet">
 </head>
+<!-- Modal de Confirmação -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalTitle">Confirmar ação</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmModalMessage" class="mb-0">Tem certeza?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-1"></i>Cancelar
+                </button>
+                <button type="button" class="btn btn-gradient" id="confirmModalYes">
+                    <i class="bi bi-check-circle me-1"></i>Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <body>
 <!-- Sidebar -->
 <?php include "includes/sidebar.php"; ?>
@@ -203,8 +270,9 @@ if ($action === 'list') {
                                 <th>Nome</th>
                                 <th>Usuário</th>
                                 <th width="150">Perfil</th>
+                                <th width="120">Status</th>
                                 <th width="120">Criado em</th>
-                                <th width="120">Ações</th>
+                                <th width="200">Ações</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -234,6 +302,16 @@ if ($action === 'list') {
                                                 </span>
                                     </td>
                                     <td>
+                                        <?php if ((int)$user['is_active'] === 1): ?>
+                                            <span class="badge bg-success"><i class="bi bi-check2-circle me-1"></i>Ativo</span>
+                                        <?php else: ?>
+                                            <?php if (!empty($user['deactivated_by'])): ?>
+                                            <span class="text-muted"><span class="badge bg-secondary"><i class="bi bi-slash-circle me-1"></i>Inativo por <?= htmlspecialchars($user['deactivated_by']) ?><br><?= htmlspecialchars($user['deactivated_at']) ?></span></span>
+                                            <?php endif; ?>
+                                        <?php endif; ?>
+                                    </td>
+
+                                    <td>
                                         <small class="text-muted">
                                             <?= date('d/m/Y', strtotime($user['created_at'])) ?>
                                         </small>
@@ -245,16 +323,46 @@ if ($action === 'list') {
                                                title="Editar">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
+
                                             <?php if ($user['id'] != $_SESSION['user_id']): ?>
-                                                <a href="users.php?action=delete&id=<?= $user['id'] ?>"
-                                                   class="btn btn-outline-danger"
-                                                   title="Excluir"
-                                                   onclick="return confirm('Tem certeza que deseja excluir este usuário?')">
+                                                <?php if ((int)$user['is_active'] === 1): ?>
+                                                    <button type="button"
+                                                            class="btn btn-outline-warning"
+                                                            title="Desativar"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#confirmModal"
+                                                            data-title="Desativar usuário"
+                                                            data-message="Desativar este usuário? Ele não poderá acessar o sistema."
+                                                            data-href="users.php?action=toggle_active&id=<?= $user['id'] ?>">
+                                                        <i class="bi bi-pause-circle"></i>
+                                                    </button>
+                                                <?php else: ?>
+                                                    <button type="button"
+                                                            class="btn btn-outline-success"
+                                                            title="Reativar"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#confirmModal"
+                                                            data-title="Reativar usuário"
+                                                            data-message="Reativar este usuário?"
+                                                            data-href="users.php?action=toggle_active&id=<?= $user['id'] ?>">
+                                                        <i class="bi bi-play-circle"></i>
+                                                    </button>
+                                                <?php endif; ?>
+
+                                                <button type="button"
+                                                        class="btn btn-outline-danger"
+                                                        title="Excluir"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#confirmModal"
+                                                        data-title="Excluir usuário"
+                                                        data-message="Tem certeza que deseja excluir este usuário? Esta ação é irreversível."
+                                                        data-href="users.php?action=delete&id=<?= $user['id'] ?>">
                                                     <i class="bi bi-trash"></i>
-                                                </a>
+                                                </button>
                                             <?php endif; ?>
                                         </div>
                                     </td>
+
                                 </tr>
                             <?php endforeach; ?>
                             </tbody>
@@ -386,5 +494,28 @@ if ($action === 'list') {
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    (function(){
+        const modalEl = document.getElementById('confirmModal');
+        let targetHref = null;
+
+        modalEl.addEventListener('show.bs.modal', function (event) {
+            const button   = event.relatedTarget;
+            const title    = button.getAttribute('data-title')   || 'Confirmar ação';
+            const message  = button.getAttribute('data-message') || 'Tem certeza?';
+            targetHref     = button.getAttribute('data-href');
+
+            modalEl.querySelector('#confirmModalTitle').textContent = title;
+            modalEl.querySelector('#confirmModalMessage').textContent = message;
+        });
+
+        document.getElementById('confirmModalYes').addEventListener('click', function(){
+            if (targetHref) {
+                window.location.href = targetHref; // mantém sua lógica via GET
+            }
+        });
+    })();
+</script>
+
 </body>
 </html>

@@ -33,9 +33,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($username === '' || $password === '') {
         $error = 'Por favor, preencha todos os campos.';
     } else {
-        // compara em lowercase no SQL também (robustez)
+        // Busca também status de atividade e auditoria
         $stmt = $pdo->prepare("
-            SELECT id, name, username, password, role
+            SELECT id, name, username, password, role,
+                   COALESCE(is_active, 1) AS is_active,
+                   deactivated_at, deactivated_by
             FROM users
             WHERE LOWER(username) = ?
             LIMIT 1
@@ -43,23 +45,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute([$username]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($user && password_verify($password, $user['password'])) {
-            $_SESSION['user_id']       = $user['id'];
-            $_SESSION['user_name']     = $user['name'];
-            $_SESSION['user_username'] = $user['username'];
-            $_SESSION['user_role']     = $user['role'];
 
-            if ($user['role'] === 'nurse') {
-                header('Location: nurse/');
+        if ($user && password_verify($password, $user['password'])) {
+
+            if ((int)$user['is_active'] !== 1) {
+                // mensagem amigável com quem/quando desativou (se existir)
+                $when = $user['deactivated_at'] ? date('d/m/Y H:i', strtotime($user['deactivated_at'])) : null;
+                $by   = $user['deactivated_by'] ?: null;
+
+                $msg = 'Sua conta está desativada.';
+                if ($when || $by) {
+                    $msg .= ' ';
+                }
+                $msg .= ' Procure o administrador.';
+                $error = $msg;
+
             } else {
-                header('Location: dashboard.php');
+
+                $_SESSION['user_id']       = $user['id'];
+                $_SESSION['user_name']     = $user['name'];
+                $_SESSION['user_username'] = $user['username'];
+                $_SESSION['user_role']     = $user['role'];
+
+                if ($user['role'] === 'nurse') {
+                    header('Location: nurse/');
+                } else {
+                    header('Location: dashboard.php');
+                }
+                exit;
             }
-            exit;
         } else {
             $error = 'Nome de usuário ou senha incorretos.';
         }
     }
 }
+
 
 
 if (isset($_GET['logout'])) {
