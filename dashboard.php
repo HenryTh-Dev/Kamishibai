@@ -9,6 +9,9 @@ $total_categories = $stmt->fetchColumn();
 $stmt = $pdo->query("SELECT COUNT(*) FROM items");
 $total_items = $stmt->fetchColumn();
 
+$stmt = $pdo->query("SELECT COUNT(*) FROM activity_records");
+$total_activity = $stmt->fetchColumn();
+
 $stmt = $pdo->query("SELECT COUNT(*) FROM users");
 $total_users = $stmt->fetchColumn();
 ?>
@@ -98,7 +101,7 @@ $total_users = $stmt->fetchColumn();
                         <div class="stats-icon warning">
                             <i class="bi bi-clipboard-data"></i>
                         </div>
-                        <h3 class="mb-1">0</h3>
+                        <h3 class="mb-1"><?= $total_activity?></h3>
                         <p class="text-muted mb-0">Registros</p>
                     </div>
                 </div>
