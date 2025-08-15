@@ -10,7 +10,7 @@
 
     <div class="sidebar-nav">
         <div class="nav-item">
-            <a href="dashboard.php" class="nav-link active">
+            <a href="dashboard.php" class="nav-link">
                 <i class="bi bi-speedometer2"></i>
                 Dashboard
             </a>
@@ -34,7 +34,7 @@
             </a>
         </div>
         <div class="nav-item">
-            <a class="nav-link">
+            <a href="audit.php" class="nav-link">
                 <i class="bi bi-archive"></i>
                 Auditoria de Dados
             </a>
