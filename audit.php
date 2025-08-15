@@ -172,19 +172,19 @@ include "includes/sidebar.php";
     <!-- Topbar -->
     <div class="top-navbar">
         <h5 class="mb-0"><i class="bi bi-search me-2"></i>Auditoria de Dados</h5>
-        <div class="d-flex align-items-center gap-3">
-            <span class="text-muted small d-none d-md-inline">Olá, <?= htmlspecialchars($user_name) ?></span>
-            <div class="dropdown user-menu">
-                <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown">
-                    <i class="bi bi-person-circle me-2"></i>Conta
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="export.php"><i class="bi bi-download me-2"></i>Exportar dados</a></li>
-                    <li><a class="dropdown-item" href="password.php"><i class="bi bi-shield-lock me-2"></i>Alterar senha</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="../logout.php"><i class="bi bi-box-arrow-right me-2"></i>Sair</a></li>
-                </ul>
-            </div>
+        <div class="dropdown">
+            <span class="me-3">Bem-vindo, <?= htmlspecialchars($_SESSION['user_name']) ?>!</span>
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="bi bi-person-circle"></i>
+            </button>
+            <ul class="dropdown-menu">
+                <li>
+                    <a class="dropdown-item" href="logout.php">
+                        <i class="bi bi-box-arrow-right me-2"></i>
+                        Sair
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
 

@@ -327,73 +327,75 @@ function setFooterStatus($pdo) {
 }
 
 function recordActivity($pdo) {
+    header('Content-Type: application/json; charset=UTF-8');
+
     try {
-        // Verificar método HTTP
+        // Hora de Brasília
+        $nowBr = (new DateTime('now', new DateTimeZone('America/Sao_Paulo')))->format('Y-m-d H:i:s');
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             http_response_code(405);
             echo json_encode(['error' => 'Método não permitido']);
             return;
         }
-        
-        // Obter dados do POST
-        $input = json_decode(file_get_contents('php://input'), true);
-        
-        $item_id = $input['item_id'] ?? null;
-        $status = $input['status'] ?? null;
+
+        $input       = json_decode(file_get_contents('php://input'), true) ?? [];
+        $item_id     = $input['item_id']     ?? null;
+        $status      = $input['status']      ?? null;
         $record_date = $input['record_date'] ?? date('Y-m-d');
-        $notes = $input['notes'] ?? null;
-        
+        $notes       = $input['notes']       ?? null;
+
         // Validações
         if (!$item_id || !$status) {
             http_response_code(400);
             echo json_encode(['error' => 'Item ID e status são obrigatórios']);
             return;
         }
-
-        if (!in_array($status, ['C', 'NC', 'NA'])) {
+        if (!in_array($status, ['C','NC','NA'], true)) {
             http_response_code(400);
             echo json_encode(['error' => 'Status deve ser C, NC ou NA']);
             return;
         }
-        
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $record_date)) {
             http_response_code(400);
-            echo json_encode(['error' => 'Formato de data inválido']);
+            echo json_encode(['error' => 'Formato de data inválido (YYYY-MM-DD)']);
             return;
         }
-        
-        // Verificar se o item existe
-        $stmt = $pdo->prepare("SELECT id FROM items WHERE id = ?");
+
+        // Verifica se o item existe
+        $stmt = $pdo->prepare("SELECT 1 FROM items WHERE id = ?");
         $stmt->execute([$item_id]);
-        if (!$stmt->fetch()) {
+        if (!$stmt->fetchColumn()) {
             http_response_code(404);
             echo json_encode(['error' => 'Item não encontrado']);
             return;
         }
-        
-        // Inserir ou atualizar registro
+
+        // UPSERT sem updated_at
         $sql = "
-        INSERT INTO activity_records (item_id, record_date, status, notes, created_at)
-        VALUES (?, ?, ?, ?, datetime('now'))
-        ON CONFLICT(item_id, record_date)
-        DO UPDATE SET
-            status     = excluded.status,
-            notes      = excluded.notes,
-            created_at = datetime('now')
-    ";
-        
+            INSERT INTO activity_records (item_id, record_date, status, notes, created_at)
+            VALUES (?, ?, ?, ?, ?)
+            ON CONFLICT(item_id, record_date) DO UPDATE SET
+                status = excluded.status,
+                notes  = excluded.notes
+        ";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$item_id, $record_date, $status, $notes]);
+        $stmt->execute([$item_id, $record_date, $status, $notes, $nowBr]);
 
         echo json_encode([
             'success' => true,
             'message' => 'Atividade registrada com sucesso',
-            'data'    => ['item_id'=>$item_id,'status'=>$status,'record_date'=>$record_date,'notes'=>$notes]
+            'data'    => [
+                'item_id'     => $item_id,
+                'status'      => $status,
+                'record_date' => $record_date,
+                'notes'       => $notes,
+                'saved_at'    => $nowBr
+            ]
         ]);
-        
-    } catch (Exception $e) {
+    } catch (Throwable $e) {
         http_response_code(500);
-        echo json_encode(['error' => 'Erro ao registrar atividade: ' . $e->getMessage()]);
+        echo json_encode(['error' => 'Erro ao registrar atividade: '.$e->getMessage()]);
     }
 }
 
