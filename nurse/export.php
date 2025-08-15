@@ -4,8 +4,15 @@ if (function_exists('apache_setenv')) {
 }
 ini_set('zlib.output_compression', 'Off');
 
-require_once 'config.php';
-requireAuth();
+require_once '../config.php';
+
+// Verificar se o usuário está logado e é enfermeira
+if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'nurse') {
+    header('Location: ../login.php?redirect=nurse');
+    exit;
+}
+
+$user_name = $_SESSION['user_name'] ?? 'Enfermeira';
 
 $error  = '';
 $period = '';
@@ -71,13 +78,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Relatório Mensal – Kamishibai</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="/css/export.css" rel="stylesheet">
+    <link href="export.css" rel="stylesheet">
 </head>
 <body>
 <!-- Sidebar -->
-<?php
-include "includes/sidebar.php";
-?>
+
+<nav class="sidebar">
+    <div class="sidebar-header">
+        <img src="../logo.png" width="50px" style="opacity: 0.8;">
+        <h4 class="mb-0">
+            Kamishibai Enfermagem
+        </h4>
+        <p class="mb-0 opacity-75 small">Santa Casa de Araçatuba</p>
+    </div>
+
+    <div class="sidebar-nav">
+        <div class="nav-item">
+            <a href=".." class="nav-link">
+                <i class="bi bi-kanban"></i>
+                Kanban
+            </a>
+            <a href="password.php" class="nav-link">
+                <i class="bi bi-people"></i>
+                Alterar Senha
+            </a>
+            <a href="export.php" class="nav-link">
+                <i class="bi bi-calendar"></i>
+                Relatório Mensal
+            </a>
+        </div>
+        <hr class="my-3" style="border-color: rgba(255, 255, 255, 0.1);">
+        <div class="nav-item">
+            <a href="../logout.php" class="nav-link">
+                <i class="bi bi-box-arrow-right"></i>
+                Sair
+            </a>
+        </div>
+        <footer class="app-footer mt-auto py-3">
+            <div class="container text-center">
+                <small>Desenvolvido por <a href="https://www.santacasadearacatuba.com.br/" target="_blank">Tecnologia da Informação Santa Casa de Araçatuba</a></small>
+            </div>
+        </footer>
+    </div>
+</nav>
 
 <!-- Main Content -->
 <div class="main-content">

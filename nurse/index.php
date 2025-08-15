@@ -32,12 +32,43 @@ $user_name = $_SESSION['user_name'] ?? 'Enfermeira';
                 </h1>
                 <p class="mb-0 mt-2 opacity-75">Bem-vinda, <?= htmlspecialchars($user_name) ?>!</p>
             </div>
+
             <div class="col-md-4 text-end">
-                <button type="button" class="logout-btn" onclick="logout()">
-                    <i class="bi bi-box-arrow-right me-2"></i>
-                    Sair
-                </button>
+                <div class="d-inline-flex align-items-center gap-3">
+
+                    <div class="dropdown user-menu">
+                        <button class="btn btn-light dropdown-toggle d-flex align-items-center"
+                                type="button"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                            <i class="bi bi-person-circle me-2"></i>
+                            Conta
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center" href="export.php">
+                                    <i class="bi bi-download me-2"></i>
+                                    Exportar dados
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center" href="password.php">
+                                    <i class="bi bi-shield-lock me-2"></i>
+                                    Alterar senha
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-danger d-flex align-items-center" href="../logout.php">
+                                    <i class="bi bi-box-arrow-right me-2"></i>
+                                    Sair
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
+
         </div>
     </div>
 </div>
