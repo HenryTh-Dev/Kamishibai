@@ -27,27 +27,30 @@ if (isset($_GET['error'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['username'] ?? '';
+    $username = strtolower(trim($_POST['username'] ?? ''));
     $password = $_POST['password'] ?? '';
 
-    if (empty($username) || empty($password)) {
+    if ($username === '' || $password === '') {
         $error = 'Por favor, preencha todos os campos.';
     } else {
-        $stmt = $pdo->prepare("SELECT id, name, username, password, role FROM users WHERE username = ?");
+        // compara em lowercase no SQL também (robustez)
+        $stmt = $pdo->prepare("
+            SELECT id, name, username, password, role
+            FROM users
+            WHERE LOWER(username) = ?
+            LIMIT 1
+        ");
         $stmt->execute([$username]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user && password_verify($password, $user['password'])) {
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['user_name'] = $user['name'];
+            $_SESSION['user_id']       = $user['id'];
+            $_SESSION['user_name']     = $user['name'];
             $_SESSION['user_username'] = $user['username'];
-            $_SESSION['user_role'] = $user['role'];
+            $_SESSION['user_role']     = $user['role'];
 
-            // Redirecionar baseado no perfil do usuário
             if ($user['role'] === 'nurse') {
                 header('Location: nurse/');
-            } elseif ($user['role'] === 'admin') {
-                header('Location: dashboard.php');
             } else {
                 header('Location: dashboard.php');
             }
@@ -57,6 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+
 
 if (isset($_GET['logout'])) {
     $success = 'Logout realizado com sucesso!';
@@ -80,7 +84,7 @@ if (isset($_GET['logout'])) {
                 <div class="login-header">
                     <img src="logo-completa.png" width="150vmin" style="opacity: 0.9;">
                     <h3 class="mb-0">Kamishibai Logon</h3>
-                    <p class="mb-0 opacity-75">Área Administrativa</p>
+                    <p class="mb-0 opacity-75">Santa Casa de Araçatuba</p>
                 </div>
 
                 <div class="login-body">
@@ -103,13 +107,11 @@ if (isset($_GET['logout'])) {
                     <form method="POST">
                         <div class="input-group">
                             <i class="bi bi-person"></i>
-                            <input type="text"
-                                   class="form-control"
-                                   name="username"
+                            <input type="text" class="form-control" name="username"
+                                   style="text-transform: lowercase;"
+                                   oninput="this.value = this.value.toLowerCase()"
                                    value="<?= htmlspecialchars($_POST['username'] ?? '') ?>"
-                                   placeholder="Nome de usuário"
-                                   required
-                                   autofocus>
+                                   placeholder="Nome de usuário" required autofocus>
                         </div>
 
                         <div class="input-group">

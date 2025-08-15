@@ -11,7 +11,7 @@ $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'create') {
         $name     = trim($_POST['name'] ?? '');
-        $username = trim($_POST['username'] ?? '');
+        $username = strtolower(trim($_POST['username'] ?? ''));
         $password = $_POST['password'] ?? '';
         $role     = $_POST['role'] ?? 'user';
 
@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = 'A senha deve ter pelo menos 6 caracteres.';
         } else {
             // Verificar se username já existe
-            $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ?");
+            $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE LOWER(username) = ?");
             $stmt->execute([$username]);
 
             if ($stmt->fetchColumn() > 0) {
@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     } elseif ($action === 'edit' && $id) {
         $name     = trim($_POST['name'] ?? '');
-        $username = trim($_POST['username'] ?? '');
+        $username = strtolower(trim($_POST['username'] ?? ''));
         $password = $_POST['password'] ?? '';
         $role     = $_POST['role'] ?? 'user';
 
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = 'O nome de usuário deve ter 3–50 caracteres e usar apenas letras, números, ponto, traço e underline.';
         } else {
             // Verificar se username já existe para outro usuário
-            $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ? AND id != ?");
+            $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE LOWER(username) = ? AND id != ?");
             $stmt->execute([$username, $id]);
 
             if ($stmt->fetchColumn() > 0) {
